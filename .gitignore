@@ -1,3 +1,10 @@
+# Used Node template
+
+# Custom added stuff #
+.vscode
+
+
+# Template stuff #
 # Logs
 logs
 *.log
