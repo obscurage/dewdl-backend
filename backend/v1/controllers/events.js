@@ -1,7 +1,7 @@
 const eventsRouter = require("express").Router();
 const Event = require("../models/event");
 
-eventsRouter.get("/list", (request, response) => {
+eventsRouter.get("/list", async (request, response) => {
     Event.aggregate([
         {
             $project: {
@@ -16,16 +16,13 @@ eventsRouter.get("/list", (request, response) => {
     });
 });
 
-eventsRouter.get("/:id", (request, response, next) => {
-    Event.findById(request.params.id)
-        .then(event => {
-            if (event) {
-                response.json(event.toJSON());
-            } else {
-                response.status(404).end();
-            }
-        })
-        .catch(error => next(error));
+eventsRouter.get("/:id", async (request, response) => {
+    const event = await Event.findById(request.params.id).exec();
+    if (event) {
+        response.json(event.toJSON());
+    } else {
+        response.status(404).end();
+    }
 });
 
 module.exports = eventsRouter;

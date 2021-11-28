@@ -32,6 +32,36 @@ describe("Database contains some events", () => {
         const names = response.body.map(r => r.name);
         expect(names).toContain("Tabletop gaming");
     });
+
+    describe("Viewing a specific event", () => {
+        test("Succeed with a valid id", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventToView = eventsAtStart[0];
+            const resultEvent = await api
+                .get(`/api/v1/event/${eventToView.id}`)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+            const processedEventToView = JSON.parse(JSON.stringify(eventToView));
+
+            expect(resultEvent.body).toEqual(processedEventToView);
+        });
+
+        test("Fail with statuscode 404 - event does not exist", async () => {
+            const validNonexistingId = await helper.nonExistingId();
+
+            await api
+                .get(`/api/v1/event/${validNonexistingId}`)
+                .expect(404);
+        });
+
+        test("Fail with statuscode 400 - id is invalid", async () => {
+            const invalidId = "123123soitaheti";
+
+            await api
+                .get(`/api/v1/event/${invalidId}`)
+                .expect(400);
+        });
+    });    
 });
 
 

@@ -54,8 +54,7 @@ const initialEvents = [
         dates: [
             "2016-12-31",
             "2017-01-01"
-        ],
-        votes: []
+        ]
     },
 ];
 
@@ -67,8 +66,14 @@ const nonExistingId = async () => {
     return event._id.toString();
 };
 
+const eventsInDb = async () => {
+    const events = await Event.find({});
+    return events.map(event => event.toJSON());
+};
+
 
 module.exports = {
     initialEvents,
-    nonExistingId
+    nonExistingId,
+    eventsInDb
 };
