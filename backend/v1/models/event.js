@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema({
-    name: String,
-    dates: [String],
+    name: {
+        type: String,
+        required: true,
+    },
+    dates: {
+        type: [String],
+        required: true
+    },
     votes: [
         {
             date: String,

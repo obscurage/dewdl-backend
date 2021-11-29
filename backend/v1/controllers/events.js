@@ -25,4 +25,16 @@ eventsRouter.get("/:id", async (request, response) => {
     }
 });
 
+eventsRouter.post("/", async (request, response) => {
+    const body = request.body;
+
+    const event = new Event({
+        name: body.name,
+        dates: body.dates
+    });
+
+    const savedEvent = await event.save();
+    response.json({ "id": savedEvent.id });
+});
+
 module.exports = eventsRouter;

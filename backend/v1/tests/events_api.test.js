@@ -28,7 +28,7 @@ describe("Database contains some events", () => {
 
     test("a specific event is with the returned events", async () => {
         const response = await api.get("/api/v1/event/list");
-        
+
         const names = response.body.map(r => r.name);
         expect(names).toContain("Tabletop gaming");
     });
@@ -61,7 +61,50 @@ describe("Database contains some events", () => {
                 .get(`/api/v1/event/${invalidId}`)
                 .expect(400);
         });
-    });    
+    });
+
+    describe("Add a new event", () => {
+
+        test("Succeed with valid data", async () => {
+            const newEvent = {
+                "name": "Jake's secret party yes",
+                "dates": [
+                    "2014-01-01",
+                    "2014-01-05",
+                    "2014-01-12"
+                ]
+            }
+
+            await api
+                .post(`/api/v1/event/`)
+                .send(newEvent)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+            
+            const eventsAtEnd = await helper.eventsInDb();
+            expect(eventsAtEnd).toHaveLength(helper.initialEvents.length + 1);
+
+            const names = eventsAtEnd.map(e => e.name);
+            expect(names).toContain("Jake's secret party yes");
+        });
+
+        test("Fail with status code 400 invalid data", async () => {
+            const newEvent = {
+                "dates": [
+                    "2014-01-01"
+                ]
+            }
+
+            await api
+                .post(`/api/v1/event/`)
+                .send(newEvent)
+                .expect(400);
+            
+            const eventsAtEnd = await helper.eventsInDb();
+
+            expect(eventsAtEnd).toHaveLength(helper.initialEvents.length);
+        });
+    });
 });
 
 
