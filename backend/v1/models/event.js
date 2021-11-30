@@ -23,7 +23,6 @@ eventSchema.set("toJSON", {
         delete returnedObject._id;
         delete returnedObject.__v;
         returnedObject.votes.forEach(vote => {
-            vote.id = vote._id.toString();
             delete vote._id;
         });
     }

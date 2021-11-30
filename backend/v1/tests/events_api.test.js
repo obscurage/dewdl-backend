@@ -80,7 +80,7 @@ describe("Database contains some events", () => {
                 .send(newEvent)
                 .expect(200)
                 .expect("Content-Type", /application\/json/);
-            
+
             const eventsAtEnd = await helper.eventsInDb();
             expect(eventsAtEnd).toHaveLength(helper.initialEvents.length + 1);
 
@@ -99,10 +99,92 @@ describe("Database contains some events", () => {
                 .post(`/api/v1/event/`)
                 .send(newEvent)
                 .expect(400);
-            
+
             const eventsAtEnd = await helper.eventsInDb();
 
             expect(eventsAtEnd).toHaveLength(helper.initialEvents.length);
+        });
+    });
+
+    describe("Add vote to an event", () => {
+
+        test("Succeed with valid data", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventIdToView = eventsAtStart[0].id;
+
+            const newVote = {
+                "name": "Dick",
+                "votes": [
+                    "2014-01-01",
+                    "2014-01-05"
+                ]
+            }
+
+            const expectedName = [newVote.name];
+
+            expect(eventsAtStart[0].votes).toHaveLength(1);
+            expect(eventsAtStart[0].votes[0].people).not.toEqual(expect.arrayContaining(expectedName));
+
+            await api
+                .post(`/api/v1/event/${eventIdToView}/vote`)
+                .send(newVote)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            const eventsAtEnd = await helper.eventsInDb();
+
+            expect(eventsAtEnd[0].votes).toHaveLength(eventsAtStart[0].votes.length + 1);
+            expect(eventsAtEnd[0].votes[0].people).toEqual(expect.arrayContaining(expectedName));
+            expect(eventsAtEnd[0].votes[1].date).toEqual(newVote.votes[1]);
+            expect(eventsAtEnd[0].votes[1].people).toEqual(expect.arrayContaining(expectedName));
+        });
+
+        test("Fail with invalid data: missing name", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventIdToView = eventsAtStart[0].id;
+
+            const newVote = {
+                "votes": [
+                    "2014-01-01",
+                    "2014-01-05"
+                ]
+            }
+
+            await api
+                .post(`/api/v1/event/${eventIdToView}/vote`)
+                .send(newVote)
+                .expect(400);
+        });
+
+        test("Fail with invalid data: missing votes", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventIdToView = eventsAtStart[0].id;
+
+            const newVote = {
+                "name": "Dick"
+            }
+            
+            await api
+                .post(`/api/v1/event/${eventIdToView}/vote`)
+                .send(newVote)
+                .expect(400);
+        });
+
+        test("Fail with invalid id", async () => {
+            const invalidId = "123123soitaheti";
+
+            const newVote = {
+                "name": "Dick",
+                "votes": [
+                    "2014-01-01",
+                    "2014-01-05"
+                ]
+            }
+
+            await api
+                .post(`/api/v1/event/${invalidId}/vote`)
+                .send(newVote)
+                .expect(400);
         });
     });
 });

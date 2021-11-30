@@ -37,4 +37,35 @@ eventsRouter.post("/", async (request, response) => {
     response.json({ "id": savedEvent.id });
 });
 
+eventsRouter.post("/:id/vote", async (request, response) => {
+    const voteName = request.body.name;
+    const voteDates = request.body.votes;
+
+    if (request.body === undefined || voteName === undefined || voteName === "" || voteDates === undefined || voteDates.length === 0) {
+        return response.status(400).json({ error: 'problems with content' });
+    }
+
+    // I bet this can be done more neatly.
+    await Event.findById(request.params.id).then(event => {
+        voteDates.forEach(voteDate => {
+            if (event.votes.filter(e => e.date === voteDate).length === 0) {
+                event.votes.push({
+                    date: voteDate,
+                    people: [voteName]
+                });
+                return;
+            }
+
+            event.votes.forEach(eventVote => {
+                if (eventVote.date === voteDate) {
+                    eventVote.people.push(voteName);
+                }
+            });
+        });
+
+        event.save();
+        response.json(event.toJSON());
+    });
+});
+
 module.exports = eventsRouter;

@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/v1/event/61a3bc52afbcbe075fa82880/vote
+Content-Type:  application/json
+
+{
+    "name": "Dick",
+    "votes": [
+        "2014-01-01",
+        "2014-01-05"
+    ]
+}
