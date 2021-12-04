@@ -29,7 +29,6 @@ const initialEvents = [
             {
                 date: "2016-05-28",
                 people: [
-                    "Joku",
                     "Dewd",
                     "Dewdette"
                 ]
@@ -44,7 +43,8 @@ const initialEvents = [
             {
                 date: "2016-05-30",
                 people: [
-                    "Joku"
+                    "Joku",
+                    "Dewd"
                 ]
             }
         ]

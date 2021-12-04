@@ -12,25 +12,26 @@ describe("Database contains some events", () => {
         await Event.insertMany(helper.initialEvents);
     });
 
+    describe("Test initial events", () => {
+        test("events are returned as json", async () => {
+            await api
+                .get("/api/v1/event/list")
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+        });
 
-    test("events are returned as json", async () => {
-        await api
-            .get("/api/v1/event/list")
-            .expect(200)
-            .expect("Content-Type", /application\/json/);
-    });
+        test("all events are returned", async () => {
+            const response = await api.get("/api/v1/event/list");
 
-    test("all events are returned", async () => {
-        const response = await api.get("/api/v1/event/list");
+            expect(response.body).toHaveLength(helper.initialEvents.length);
+        });
 
-        expect(response.body).toHaveLength(helper.initialEvents.length);
-    });
+        test("a specific event is with the returned events", async () => {
+            const response = await api.get("/api/v1/event/list");
 
-    test("a specific event is with the returned events", async () => {
-        const response = await api.get("/api/v1/event/list");
-
-        const names = response.body.map(r => r.name);
-        expect(names).toContain("Tabletop gaming");
+            const names = response.body.map(r => r.name);
+            expect(names).toContain("Tabletop gaming");
+        });
     });
 
     describe("Viewing a specific event", () => {
@@ -163,7 +164,7 @@ describe("Database contains some events", () => {
             const newVote = {
                 "name": "Dick"
             };
-            
+
             await api
                 .post(`/api/v1/event/${eventIdToView}/vote`)
                 .send(newVote)
@@ -185,6 +186,66 @@ describe("Database contains some events", () => {
                 .post(`/api/v1/event/${invalidId}/vote`)
                 .send(newVote)
                 .expect(400);
+        });
+    });
+
+    describe("Get results of a specific event", () => {
+        test("Succeed with one suitable date before adding vote", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventToView = eventsAtStart[0];
+
+            const resultEvent = await api
+                .get(`/api/v1/event/${eventToView.id}/results`)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            expect(resultEvent.body.suitableDates).toHaveLength(1);
+        });
+
+        test("Succeed with one suitable date after adding vote", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventToView = eventsAtStart[0];
+
+            const newVote = {
+                "name": "Dick",
+                "votes": [
+                    "2014-01-01",
+                    "2014-01-05"
+                ]
+            };
+
+            const expectedName = [newVote.name];
+
+            await api
+                .post(`/api/v1/event/${eventToView.id}/vote`)
+                .send(newVote)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            const eventsAtEnd = await helper.eventsInDb();
+
+            expect(eventsAtEnd[0].votes).toHaveLength(2);
+            expect(eventsAtEnd[0].votes[0].people).toEqual(expect.arrayContaining(expectedName));
+
+            const resultEvent = await api
+                .get(`/api/v1/event/${eventToView.id}/results`)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            expect(resultEvent.body.suitableDates).toHaveLength(1);
+            expect(resultEvent.body.suitableDates[0].people).toEqual(expect.arrayContaining(expectedName));
+        }, 100000);
+
+        test("Succeed with no suitable dates", async () => {
+            const eventsAtStart = await helper.eventsInDb();
+            const eventToView = eventsAtStart[1];
+
+            const resultEvent = await api
+                .get(`/api/v1/event/${eventToView.id}/results`)
+                .expect(200)
+                .expect("Content-Type", /application\/json/);
+
+            expect(resultEvent.body.suitableDates).toHaveLength(0);
         });
     });
 });
