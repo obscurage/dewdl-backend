@@ -1,5 +1,6 @@
 const eventsRouter = require("express").Router();
 const Event = require("../models/event");
+const helpers = require("../../utils/helpers");
 
 eventsRouter.get("/list", async (request, response) => {
     Event.aggregate([
@@ -58,6 +59,7 @@ eventsRouter.post("/:id/vote", async (request, response) => {
 
             event.votes.forEach(eventVote => {
                 if (eventVote.date === voteDate) {
+                    // @todo : handle distinct names
                     eventVote.people.push(voteName);
                 }
             });
@@ -66,6 +68,40 @@ eventsRouter.post("/:id/vote", async (request, response) => {
         event.save();
         response.json(event.toJSON());
     });
+});
+
+eventsRouter.get("/:id/results", async (request, response) => {
+    await Event.findById(request.params.id).then(event => {
+        event = event.toJSON();
+        const result = {
+            "id": event.id,
+            "name" : event.name,
+            "suitableDates" : []
+        };
+
+        const names = [];
+        event.votes.forEach(vote => {
+            vote.people.forEach(name => {
+                if (names.indexOf(name) === -1) {
+                    names.push(name);
+                }
+            });
+        });
+
+        names.sort();
+
+        event.votes.forEach(vote => {
+            const peopleSorted = [...vote.people].sort();
+            if (helpers.arrayEquals(peopleSorted, names)) {
+                result.suitableDates.push({
+                    "date" : vote.date,
+                    "people" : vote.people
+                });
+            }
+        });
+        response.json(result);
+    });
+
 });
 
 module.exports = eventsRouter;

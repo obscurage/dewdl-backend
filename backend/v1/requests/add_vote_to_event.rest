@@ -1,4 +1,4 @@
-POST http://localhost:3001/api/v1/event/61a3bc52afbcbe075fa82880/vote
+POST http://localhost:3001/api/v1/event/<ADD_ID>/vote
 Content-Type:  application/json
 
 {
