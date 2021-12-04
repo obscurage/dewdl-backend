@@ -48,6 +48,8 @@ eventsRouter.post("/:id/vote", async (request, response) => {
 
     // I bet this can be done more neatly.
     await Event.findById(request.params.id).then(event => {
+        if (!event) return response.status(404).end();
+
         voteDates.forEach(voteDate => {
             if (event.votes.filter(e => e.date === voteDate).length === 0) {
                 event.votes.push({
@@ -72,11 +74,13 @@ eventsRouter.post("/:id/vote", async (request, response) => {
 
 eventsRouter.get("/:id/results", async (request, response) => {
     await Event.findById(request.params.id).then(event => {
+        if (!event) return response.status(404).end();
+        
         event = event.toJSON();
         const result = {
             "id": event.id,
-            "name" : event.name,
-            "suitableDates" : []
+            "name": event.name,
+            "suitableDates": []
         };
 
         const names = [];
@@ -94,8 +98,8 @@ eventsRouter.get("/:id/results", async (request, response) => {
             const peopleSorted = [...vote.people].sort();
             if (helpers.arrayEquals(peopleSorted, names)) {
                 result.suitableDates.push({
-                    "date" : vote.date,
-                    "people" : vote.people
+                    "date": vote.date,
+                    "people": vote.people
                 });
             }
         });

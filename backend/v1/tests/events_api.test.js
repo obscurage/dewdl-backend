@@ -13,20 +13,20 @@ describe("Database contains some events", () => {
     });
 
     describe("Test initial events", () => {
-        test("events are returned as json", async () => {
+        test("Events are returned as json", async () => {
             await api
                 .get("/api/v1/event/list")
                 .expect(200)
                 .expect("Content-Type", /application\/json/);
         });
 
-        test("all events are returned", async () => {
+        test("All events are returned", async () => {
             const response = await api.get("/api/v1/event/list");
 
             expect(response.body).toHaveLength(helper.initialEvents.length);
         });
 
-        test("a specific event is with the returned events", async () => {
+        test("A specific event is with the returned events", async () => {
             const response = await api.get("/api/v1/event/list");
 
             const names = response.body.map(r => r.name);
@@ -89,7 +89,7 @@ describe("Database contains some events", () => {
             expect(names).toContain("Jake's secret party yes");
         });
 
-        test("Fail with status code 400 invalid data", async () => {
+        test("Fail with status code - 400 invalid data", async () => {
             const newEvent = {
                 "dates": [
                     "2014-01-01"
@@ -140,7 +140,7 @@ describe("Database contains some events", () => {
             expect(eventsAtEnd[0].votes[1].people).toEqual(expect.arrayContaining(expectedName));
         });
 
-        test("Fail with invalid data: missing name", async () => {
+        test("Fail with statuscode 400 - invalid data: missing name", async () => {
             const eventsAtStart = await helper.eventsInDb();
             const eventIdToView = eventsAtStart[0].id;
 
@@ -157,7 +157,7 @@ describe("Database contains some events", () => {
                 .expect(400);
         });
 
-        test("Fail with invalid data: missing votes", async () => {
+        test("Fail with statuscode 400 - invalid data: missing votes", async () => {
             const eventsAtStart = await helper.eventsInDb();
             const eventIdToView = eventsAtStart[0].id;
 
@@ -171,7 +171,7 @@ describe("Database contains some events", () => {
                 .expect(400);
         });
 
-        test("Fail with invalid id", async () => {
+        test("Fail with statuscode 400 - invalid ID", async () => {
             const invalidId = "123123soitaheti";
 
             const newVote = {
@@ -187,10 +187,18 @@ describe("Database contains some events", () => {
                 .send(newVote)
                 .expect(400);
         });
+
+        test("Fail with statuscode 404 - non-existing ID", async () => {
+            const validNonexistingId = await helper.nonExistingId();
+
+            await api
+                .get(`/api/v1/event/${validNonexistingId}/vote`)
+                .expect(404);
+        });
     });
 
     describe("Get results of a specific event", () => {
-        test("Succeed with one suitable date before adding vote", async () => {
+        test("Succeed with one suitable date before adding vote - Jake's secret party", async () => {
             const eventsAtStart = await helper.eventsInDb();
             const eventToView = eventsAtStart[0];
 
@@ -202,7 +210,7 @@ describe("Database contains some events", () => {
             expect(resultEvent.body.suitableDates).toHaveLength(1);
         });
 
-        test("Succeed with one suitable date after adding vote", async () => {
+        test("Succeed with one suitable date after adding vote - Jake's secret party", async () => {
             const eventsAtStart = await helper.eventsInDb();
             const eventToView = eventsAtStart[0];
 
@@ -234,9 +242,9 @@ describe("Database contains some events", () => {
 
             expect(resultEvent.body.suitableDates).toHaveLength(1);
             expect(resultEvent.body.suitableDates[0].people).toEqual(expect.arrayContaining(expectedName));
-        }, 100000);
+        });
 
-        test("Succeed with no suitable dates", async () => {
+        test("Succeed with no suitable dates - Bowling night", async () => {
             const eventsAtStart = await helper.eventsInDb();
             const eventToView = eventsAtStart[1];
 
@@ -246,6 +254,14 @@ describe("Database contains some events", () => {
                 .expect("Content-Type", /application\/json/);
 
             expect(resultEvent.body.suitableDates).toHaveLength(0);
+        });
+
+        test("Fail with statuscode 404 - non-existing ID", async () => {
+            const validNonexistingId = await helper.nonExistingId();
+
+            await api
+                .get(`/api/v1/event/${validNonexistingId}/results`)
+                .expect(404);
         });
     });
 });
