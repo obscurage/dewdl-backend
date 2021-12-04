@@ -42,7 +42,7 @@ eventsRouter.post("/:id/vote", async (request, response) => {
     const voteDates = request.body.votes;
 
     if (request.body === undefined || voteName === undefined || voteName === "" || voteDates === undefined || voteDates.length === 0) {
-        return response.status(400).json({ error: 'problems with content' });
+        return response.status(400).json({ error: "problems with content" });
     }
 
     // I bet this can be done more neatly.

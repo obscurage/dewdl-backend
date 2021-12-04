@@ -73,10 +73,10 @@ describe("Database contains some events", () => {
                     "2014-01-05",
                     "2014-01-12"
                 ]
-            }
+            };
 
             await api
-                .post(`/api/v1/event/`)
+                .post("/api/v1/event/")
                 .send(newEvent)
                 .expect(200)
                 .expect("Content-Type", /application\/json/);
@@ -93,10 +93,10 @@ describe("Database contains some events", () => {
                 "dates": [
                     "2014-01-01"
                 ]
-            }
+            };
 
             await api
-                .post(`/api/v1/event/`)
+                .post("/api/v1/event/")
                 .send(newEvent)
                 .expect(400);
 
@@ -118,7 +118,7 @@ describe("Database contains some events", () => {
                     "2014-01-01",
                     "2014-01-05"
                 ]
-            }
+            };
 
             const expectedName = [newVote.name];
 
@@ -148,7 +148,7 @@ describe("Database contains some events", () => {
                     "2014-01-01",
                     "2014-01-05"
                 ]
-            }
+            };
 
             await api
                 .post(`/api/v1/event/${eventIdToView}/vote`)
@@ -162,7 +162,7 @@ describe("Database contains some events", () => {
 
             const newVote = {
                 "name": "Dick"
-            }
+            };
             
             await api
                 .post(`/api/v1/event/${eventIdToView}/vote`)
@@ -179,7 +179,7 @@ describe("Database contains some events", () => {
                     "2014-01-01",
                     "2014-01-05"
                 ]
-            }
+            };
 
             await api
                 .post(`/api/v1/event/${invalidId}/vote`)
