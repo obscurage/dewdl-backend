@@ -61,7 +61,7 @@ eventsRouter.post("/:id/vote", async (request, response) => {
 
             event.votes.forEach(eventVote => {
                 if (eventVote.date === voteDate) {
-                    // @todo : handle distinct names
+                    // @todo : handle distinct names?
                     eventVote.people.push(voteName);
                 }
             });
@@ -76,6 +76,7 @@ eventsRouter.get("/:id/results", async (request, response) => {
     await Event.findById(request.params.id).then(event => {
         if (!event) return response.status(404).end();
         
+        // I bet this could be done more neatly as well...
         event = event.toJSON();
         const result = {
             "id": event.id,
