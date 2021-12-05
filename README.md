@@ -34,11 +34,11 @@ When these variables are set, you can start the backend by running `npm run star
 
 The project consists of general application files and versioned API code.
 
-`utils` folder contains some general helper functionalities. 
+[utils](utils) folder contains some general helper functionalities. 
 
 With [utils/seed_db.js](utils/seed_db.js) you can insert initial content to the dev/production database which generates the situation that's described in [Eventshuffle backend API](https://gist.github.com/anttti/2b69aebc63687ebf05ec). Run the script with command `node utils/seed_db.js`
 
-Inside the folder `v1` lie the controllers and models, and for testing purposes some REST queries and test code.
+Inside the folder [v1](v1) lie the controllers and models, and for testing purposes some REST queries and test code.
 
 [Procfile](Procfile) in the root of the project is related to Heroku deployment.
 
@@ -47,6 +47,6 @@ Inside the folder `v1` lie the controllers and models, and for testing purposes 
 You can run the test suite with `npm run test`.
 Tests utilize their own database, so no need to worry about dev / production database's state.
 
-In addition, you can utilize some tool to run individual REST queries from `v1/requests` folder.
+In addition, you can utilize some tool to run individual REST queries from [v1/requests](v1/requests) folder.
 
 
