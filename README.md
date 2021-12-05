@@ -6,6 +6,8 @@ It's somewhat like Doodle, but much simplified - hence the name.
 The backend implements the API described in the [Eventshuffle gist](https://gist.github.com/anttti/2b69aebc63687ebf05ec). 
 The application as a whole ought to comprise also of a frontend.
 
+Plenty of stuffs still to do, but this could already be used!
+
 Backend can be tried out at https://sleepy-cliffs-53305.herokuapp.com/api/v1/event/list
 
 ## Tech stack
